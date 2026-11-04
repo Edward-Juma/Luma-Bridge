@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" fill="none">
+  <defs>
+    <linearGradient id="heart" x1="60" y1="70" x2="340" y2="350" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F02C7A"/>
+      <stop offset="1" stop-color="#A90068"/>
+    </linearGradient>
+    <mask id="heart-cutout" maskUnits="userSpaceOnUse" x="40" y="65" width="320" height="300">
+      <rect x="40" y="65" width="320" height="300" fill="black"/>
+      <path d="M200 351C172 329 57 239 57 165c0-54 35-89 82-89 30 0 51 17 61 43 10-26 31-43 61-43 47 0 82 35 82 89 0 74-115 164-143 186Z" fill="white"/>
+      <path d="M200 307c-25-21-93-77-93-137 0-35 22-57 53-57 20 0 33 12 40 31 7-19 20-31 40-31 31 0 53 22 53 57 0 60-68 116-93 137Z" fill="black"/>
+    </mask>
+    <path id="tagline-arc" d="M55 139C79 43 321 43 345 139"/>
+  </defs>
+  <text fill="#AD006C" font-family="Georgia,serif" font-size="31" font-weight="700" letter-spacing="3">
+    <textPath href="#tagline-arc" startOffset="50%" text-anchor="middle">LOVE AND SUPPORT</textPath>
+  </text>
+  <path d="M200 351C172 329 57 239 57 165c0-54 35-89 82-89 30 0 51 17 61 43 10-26 31-43 61-43 47 0 82 35 82 89 0 74-115 164-143 186Z" fill="url(#heart)" mask="url(#heart-cutout)"/>
+  <path d="M178 87c-17-5-27-15-25-29 1-7 6-8 10-2l8 9c-2-12 0-20 6-21 7-1 9 8 10 17 4-9 8-13 13-10 5 3 1 10-3 17 9-5 15-5 17 0 3 6-5 11-13 14-5 7-12 12-23 16l-17-5 17-6Z" fill="#FFB536"/>
+  <path d="M108 225c15-23 31-38 50-47 17-8 35-10 54-8-19 7-35 16-48 28-11 10-18 20-20 30 12-13 25-22 39-27 11-4 20-4 26 1-11 4-21 10-28 18-6 7-9 13-8 18 13-8 26-13 38-13 9 0 15 3 18 9-10 3-19 8-26 14-8 7-12 14-12 21 12-9 25-15 38-16 8-1 14 2 16 8-10 8-21 15-34 20-17 7-34 10-51 8-18-2-34-10-48-22-14-12-25-27-33-44l29 2Z" fill="#A90068"/>
+  <path d="M292 216c-14-23-30-38-49-47-17-8-35-10-54-8 19 7 35 16 48 28 11 10 18 20 20 30-12-13-25-22-39-27-11-4-20-4-26 1 11 4 21 10 28 18 6 7 9 13 8 18-13-8-26-13-38-13-9 0-15 3-18 9 10 3 19 8 26 14 8 7 12 14 12 21-12-9-25-15-38-16-8-1-14 2-16 8 10 8 21 15 34 20 17 7 34 10 51 8 18-2 34-10 48-22 14-12 25-27 33-44l-29 2Z" fill="#FFB536"/>
+  <text x="200" y="413" text-anchor="middle" fill="#AD006C" font-family="Arial,sans-serif" font-size="62" font-weight="900" letter-spacing="12">LUMA</text>
+  <text x="200" y="451" text-anchor="middle" fill="#AD006C" font-family="Arial,sans-serif" font-size="23" font-weight="700" letter-spacing="14">BRIDGE</text>
+</svg>

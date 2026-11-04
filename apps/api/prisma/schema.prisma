@@ -1,0 +1,456 @@
+generator client {
+  provider   = "prisma-client-js"
+  // Rust-free client: WASM query compiler + the pg driver adapter. No native engine binaries to
+  // download, smaller deploys and faster cold starts on Vercel / Render / containers.
+  engineType = "client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ───────────────────────── Enums ─────────────────────────
+
+enum Role {
+  BENEFICIARY
+  AUDITOR
+  ADMIN
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+  BANNED
+}
+
+enum VerificationStatus {
+  DRAFT
+  PENDING
+  NEEDS_INFO
+  APPROVED
+  REJECTED
+}
+
+enum IncomeLevel {
+  NONE
+  VERY_LOW
+  LOW
+  LOWER_MIDDLE
+  MIDDLE
+}
+
+enum Category {
+  EDUCATION
+  FOOD
+  MEDICAL
+  RENT
+  DISABILITY_SUPPORT
+  ELDERLY
+  ORPHANS
+  SMALL_BUSINESS
+  EMERGENCY_RELIEF
+  REFUGEES
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum NeedStatus {
+  DRAFT
+  PENDING
+  NEEDS_INFO
+  ACTIVE
+  FUNDED
+  CLOSED
+  REJECTED
+  SUSPENDED
+}
+
+enum DocumentKind {
+  IDENTITY
+  PROOF_OF_ADDRESS
+  INCOME_PROOF
+  MEDICAL_REPORT
+  SCHOOL_LETTER
+  RENT_NOTICE
+  REFERENCE_LETTER
+  NGO_LETTER
+  COMMUNITY_LEADER_LETTER
+  EMPLOYER_LETTER
+  HOSPITAL_LETTER
+  GOVERNMENT_DOCUMENT
+  OTHER
+}
+
+enum PaymentMethodType {
+  BANK_ACCOUNT
+  MOBILE_MONEY
+  MPESA
+  PAYPAL
+  WISE
+  STRIPE
+  USDT
+  BITCOIN
+  ETHEREUM
+  OTHER_WALLET
+}
+
+enum Gender {
+  FEMALE
+  MALE
+  OTHER
+  UNDISCLOSED
+}
+
+enum DonationStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
+
+enum Gateway {
+  STRIPE
+  PAYPAL
+  FLUTTERWAVE
+  PAYSTACK
+  MPESA
+  WISE
+  CRYPTO
+  APPLE_PAY
+  GOOGLE_PAY
+  CARD
+  MOCK
+}
+
+enum ReviewDecision {
+  APPROVE
+  REJECT
+  REQUEST_INFO
+}
+
+enum AlertSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ReportStatus {
+  OPEN
+  REVIEWING
+  DISMISSED
+  ACTIONED
+}
+
+// ───────────────────────── Models ─────────────────────────
+
+model User {
+  id               String        @id @default(cuid())
+  clerkId          String?       @unique
+  email            String        @unique
+  passwordHash     String?
+  role             Role          @default(BENEFICIARY)
+  status           AccountStatus @default(ACTIVE)
+  statusReason     String?
+  suspendedUntil   DateTime?
+  twoFactorSecret  String?
+  twoFactorEnabled Boolean       @default(false)
+  failedLogins     Int           @default(0)
+  lockedUntil      DateTime?
+  signupIp         String?
+  lastIp           String?
+  lastLoginAt      DateTime?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  beneficiary   Beneficiary?
+  notifications Notification[]
+  auditLogs     AuditLog[]
+  reviews       VerificationReview[]
+  refreshTokens RefreshToken[]
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  mfa       Boolean  @default(false) // session passed TOTP; survives rotation
+  userAgent String?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Beneficiary {
+  id                    String             @id @default(cuid())
+  userId                String             @unique
+  fullName              String
+  nationalIdEnc         String // AES-256-GCM encrypted
+  nationalIdFingerprint String             @unique // HMAC for duplicate detection
+  phone                 String
+  phoneFingerprint      String             @unique
+  gender                Gender             @default(UNDISCLOSED)
+  dateOfBirth           DateTime
+  country               String // ISO 3166-1 alpha-2
+  city                  String
+  address               String?
+  latitude              Float?
+  longitude             Float?
+  photoUrl              String?
+  incomeLevel           IncomeLevel
+  occupation            String
+  familySize            Int
+  emergencyContactName  String
+  emergencyContactPhone String
+  about                 String             @db.Text
+  verificationStatus    VerificationStatus @default(DRAFT)
+  verificationId        String?            @unique // e.g. HB-KE-7F3A9C21
+  verifiedAt            DateTime?
+  lastAuditAt           DateTime?
+  fraudScore            Int                @default(0)
+  profileCompletion     Int                @default(0)
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+
+  user           User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  needs          Need[]
+  documents      Document[]
+  paymentMethods PaymentMethodConfig[]
+  reviews        VerificationReview[]
+  alerts         FraudAlert[]
+
+  @@index([country, city])
+  @@index([verificationStatus])
+}
+
+model PaymentMethodConfig {
+  id            String            @id @default(cuid())
+  beneficiaryId String
+  type          PaymentMethodType
+  label         String
+  detailsEnc    String // encrypted JSON of account / wallet details
+  maskedHint    String // e.g. "••••4421" safe to show publicly
+  display       Boolean           @default(true)
+  createdAt     DateTime          @default(now())
+
+  beneficiary Beneficiary @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+
+  @@index([beneficiaryId])
+}
+
+model Need {
+  id            String     @id @default(cuid())
+  beneficiaryId String
+  slug          String     @unique
+  title         String
+  summary       String
+  story         String     @db.Text
+  category      Category
+  priority      Priority   @default(MEDIUM)
+  status        NeedStatus @default(DRAFT)
+  goalUsd       Decimal    @db.Decimal(14, 2)
+  raisedUsd     Decimal    @default(0) @db.Decimal(14, 2)
+  donationCount Int        @default(0)
+  deadline      DateTime?
+  images        String[]
+  coverUrl      String?
+  approvedAt    DateTime?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  beneficiary Beneficiary  @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+  documents   Document[]
+  donations   Donation[]
+  updates     NeedUpdate[]
+  comments    Comment[]
+  reports     Report[]
+  reviews     VerificationReview[]
+  alerts      FraudAlert[]
+
+  @@index([status, createdAt])
+  @@index([category])
+  @@index([priority])
+}
+
+model Document {
+  id            String       @id @default(cuid())
+  beneficiaryId String
+  needId        String?
+  kind          DocumentKind
+  url           String
+  publicId      String?
+  mime          String
+  sizeBytes     Int
+  sha256        String // content hash for duplicate-document detection
+  aiScore       Float? // 0..1 authenticity confidence from AI validator
+  aiNotes       String?
+  verified      Boolean      @default(false)
+  createdAt     DateTime     @default(now())
+
+  beneficiary Beneficiary @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+  need        Need?       @relation(fields: [needId], references: [id], onDelete: SetNull)
+
+  @@index([sha256])
+  @@index([beneficiaryId])
+}
+
+model Donation {
+  id             String         @id @default(cuid())
+  needId         String
+  amount         Decimal        @db.Decimal(20, 8) // in `currency`
+  currency       String
+  amountUsd      Decimal        @db.Decimal(14, 2)
+  fxRate         Decimal        @db.Decimal(24, 10) // currency -> USD
+  feeUsd         Decimal        @default(0) @db.Decimal(14, 2)
+  gateway        Gateway
+  gatewayRef     String?        @unique
+  status         DonationStatus @default(PENDING)
+  anonymous      Boolean        @default(true)
+  donorName      String?
+  donorCountry   String?
+  donorEmail     String?
+  message        String?
+  thankYouNote   String?
+  ip             String?
+  receiptToken   String         @unique
+  createdAt      DateTime       @default(now())
+  confirmedAt    DateTime?
+
+  need Need @relation(fields: [needId], references: [id], onDelete: Restrict)
+
+  @@index([needId, status, createdAt])
+  @@index([status, createdAt])
+}
+
+model VerificationReview {
+  id            String         @id @default(cuid())
+  beneficiaryId String
+  needId        String?
+  auditorId     String
+  decision      ReviewDecision
+  checklist     Json
+  notes         String         @db.Text
+  createdAt     DateTime       @default(now())
+
+  beneficiary Beneficiary @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+  need        Need?       @relation(fields: [needId], references: [id], onDelete: SetNull)
+  auditor     User        @relation(fields: [auditorId], references: [id])
+
+  @@index([beneficiaryId, createdAt])
+}
+
+model NeedUpdate {
+  id        String   @id @default(cuid())
+  needId    String
+  title     String
+  body      String   @db.Text
+  images    String[]
+  createdAt DateTime @default(now())
+
+  need Need @relation(fields: [needId], references: [id], onDelete: Cascade)
+
+  @@index([needId, createdAt])
+}
+
+model Comment {
+  id         String   @id @default(cuid())
+  needId     String
+  authorName String
+  body       String
+  approved   Boolean  @default(true)
+  ip         String?
+  createdAt  DateTime @default(now())
+
+  need Need @relation(fields: [needId], references: [id], onDelete: Cascade)
+
+  @@index([needId, createdAt])
+}
+
+model Report {
+  id            String       @id @default(cuid())
+  needId        String
+  reporterEmail String?
+  reason        String
+  details       String?      @db.Text
+  status        ReportStatus @default(OPEN)
+  ip            String?
+  createdAt     DateTime     @default(now())
+
+  need Need @relation(fields: [needId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt])
+}
+
+model FraudAlert {
+  id            String        @id @default(cuid())
+  beneficiaryId String?
+  needId        String?
+  type          String
+  severity      AlertSeverity
+  score         Int
+  details       Json
+  resolved      Boolean       @default(false)
+  resolvedById  String?
+  createdAt     DateTime      @default(now())
+
+  beneficiary Beneficiary? @relation(fields: [beneficiaryId], references: [id], onDelete: Cascade)
+  need        Need?        @relation(fields: [needId], references: [id], onDelete: Cascade)
+
+  @@index([resolved, severity, createdAt])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  body      String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read, createdAt])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  action    String
+  entity    String
+  entityId  String?
+  meta      Json?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([entity, entityId])
+  @@index([actorId, createdAt])
+  @@index([createdAt])
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  body      String   @db.Text
+  createdAt DateTime @default(now())
+}

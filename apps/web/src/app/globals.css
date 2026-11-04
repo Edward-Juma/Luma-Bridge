@@ -1,0 +1,129 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --page: 248 246 252;
+    --surface: 255 255 255;
+    --sunken: 244 241 250;
+    --ink: 31 25 43;
+    --muted: 94 86 111;
+    --line: 228 222 239;
+    --night: 14 10 28;
+    color-scheme: light;
+  }
+  [data-theme='dark'] {
+    --page: 12 9 22;
+    --surface: 22 18 39;
+    --sunken: 15 12 29;
+    --ink: 246 243 251;
+    --muted: 190 183 206;
+    --line: 58 51 75;
+    --night: 9 7 18;
+    color-scheme: dark;
+  }
+
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body {
+    @apply bg-page font-sans text-ink antialiased;
+    font-feature-settings: 'ss01', 'cv11';
+    text-rendering: optimizeLegibility;
+  }
+  h1, h2, h3, h4 { @apply font-display text-ink; letter-spacing: -0.02em; font-variation-settings: 'wdth' 92; text-wrap: balance; }
+  p { text-wrap: pretty; }
+  ::selection { background: rgb(112 93 194 / 0.24); }
+
+  :focus-visible { outline: 2px solid #705DC2; outline-offset: 3px; border-radius: 8px; }
+  [data-theme='dark'] :focus-visible { outline-color: #78D7E8; }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+  }
+}
+
+@layer components {
+  .glass {
+    background: rgb(255 255 255 / 0.10);
+    border: 1px solid rgb(255 255 255 / 0.16);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+  }
+  .glass-light {
+    background: rgb(var(--surface) / 0.72);
+    border: 1px solid rgb(var(--line) / 0.8);
+    backdrop-filter: blur(16px) saturate(160%);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+  }
+  .auth-theme-backdrop {
+    background: linear-gradient(132deg, rgb(var(--page)) 0%, rgb(var(--surface)) 52%, rgb(var(--sunken)) 100%);
+  }
+  .auth-theme .auth-panel .card {
+    border: 1px solid rgb(var(--line) / 0.9);
+    border-radius: 24px;
+    background: rgb(var(--surface) / 0.96);
+    box-shadow: 0 24px 70px -38px rgb(var(--night) / 0.5);
+  }
+  .auth-theme .field {
+    min-height: 48px;
+    border-color: rgb(var(--line) / 0.95);
+    border-radius: 12px;
+  }
+  .auth-theme .field:focus {
+    border-color: #78D7E8;
+    box-shadow: 0 0 0 3px rgb(120 215 232 / 0.18);
+  }
+  .auth-theme .auth-icon-box { border: 1px solid rgb(112 93 194 / 0.2); background: rgb(112 93 194 / 0.08); }
+  .auth-theme .auth-subtle-link { color: rgb(var(--muted)); transition: color 180ms ease, background-color 180ms ease; }
+  .auth-theme .auth-subtle-link:hover { color: rgb(var(--ink)); background-color: rgb(var(--sunken)); }
+  .auth-theme input[type='checkbox'] { accent-color: #705DC2; }
+  .auth-theme .btn-primary {
+    min-height: 48px;
+    color: #100d1c;
+    background: linear-gradient(105deg, #78D7E8, #A99AF0);
+    box-shadow: none;
+  }
+  .auth-theme .btn-primary:hover { background: linear-gradient(105deg, #91E2EF, #B9AEF5); }
+  .auth-theme .btn-ghost { border-color: rgb(var(--line)); background: transparent; color: rgb(var(--ink)); }
+  .auth-theme .btn-ghost:hover,
+  .auth-theme .btn-quiet:hover { background: rgb(var(--sunken)); }
+  .auth-theme :focus-visible { outline-color: #78D7E8; }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-[15px] font-semibold transition duration-200 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary { @apply btn bg-brand text-white shadow-[0_8px_24px_-8px_rgb(37_99_235/0.65)] hover:-translate-y-px hover:bg-brand-700 active:translate-y-0; }
+  .btn-accent { @apply btn bg-accent-500 text-white shadow-[0_8px_24px_-8px_rgb(16_185_129/0.6)] hover:-translate-y-px hover:bg-accent-600 active:translate-y-0; }
+  .btn-ghost { @apply btn border border-line bg-surface text-ink hover:border-ink/30 hover:bg-sunken; }
+  .btn-quiet { @apply btn text-ink hover:bg-sunken; }
+  .btn-lg { @apply px-7 py-3.5 text-base; }
+  .btn-sm { @apply px-3.5 py-1.5 text-sm; }
+
+  .field { @apply w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-[15px] text-ink placeholder:text-muted/70 transition focus:border-brand focus:outline-none focus:ring-4 focus:ring-brand/15; }
+  .field[aria-invalid='true'] { @apply border-danger focus:border-danger focus:ring-danger/15; }
+  .label { @apply mb-1.5 block text-sm font-medium text-ink; }
+  .hint { @apply mt-1.5 text-[13px] text-muted; }
+  .error { @apply mt-1.5 text-[13px] font-medium text-danger; }
+
+  .card { @apply rounded-3xl border border-line bg-surface shadow-soft; }
+  .prose-hb { @apply space-y-4 text-[17px] leading-relaxed text-ink/90; }
+  .prose-hb h2 { @apply mt-10 text-2xl font-semibold; }
+  .prose-hb h3 { @apply mt-6 text-lg font-semibold; }
+  .prose-hb ul { @apply list-disc space-y-2 pl-6; }
+  .prose-hb a { @apply text-brand underline underline-offset-4; }
+
+  /* Masonry: CSS columns keep cards at natural heights without JS layout. */
+  .masonry { column-gap: 1.25rem; columns: 1; }
+  @media (min-width: 640px) { .masonry { columns: 2; } }
+  @media (min-width: 1024px) { .masonry { columns: 3; } }
+  .masonry > * { break-inside: avoid; margin-bottom: 1.25rem; }
+
+  .skeleton { @apply relative overflow-hidden rounded-xl bg-sunken; }
+  .skeleton::after { content: ''; @apply absolute inset-0 -translate-x-full animate-shimmer; background: linear-gradient(90deg, transparent, rgb(var(--surface) / .7), transparent); }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { scrollbar-width: none; }
+}

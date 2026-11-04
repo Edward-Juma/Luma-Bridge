@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="emergency relief illustration">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#EF4444"/><stop offset="1" stop-color="#F59E0B"/></linearGradient>
+<radialGradient id="h" cx=".3" cy=".2" r=".9"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+<rect width="800" height="600" fill="url(#g)"/><rect width="800" height="600" fill="url(#h)"/>
+<circle cx="230.3628257887517" cy="508.130658436214" r="160.11689814814815" fill="#fff" opacity=".10"/>
+<circle cx="618.2716049382716" cy="124.20627572016461" r="169.70987654320987" fill="#fff" opacity=".12"/>
+<circle cx="549.0006001371742" cy="495.21141975308643" r="79.01684670781893" fill="#fff" opacity=".08"/>
+<g transform="translate(400 300) scale(2.6)"><circle r="38" fill="none" stroke="#fff" stroke-width="6"/><circle r="15" fill="none" stroke="#fff" stroke-width="6"/><path d="M-27-27L-11-11M27 27L11 11M27-27L11-11M-27 27L-11 11" stroke="#fff" stroke-width="8" stroke-linecap="round"/></g></svg>

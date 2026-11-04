@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="rent illustration">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366F1"/><stop offset="1" stop-color="#0EA5E9"/></linearGradient>
+<radialGradient id="h" cx=".3" cy=".2" r=".9"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+<rect width="800" height="600" fill="url(#g)"/><rect width="800" height="600" fill="url(#h)"/>
+<circle cx="204.84567901234567" cy="488.99279835390945" r="235.76350308641975" fill="#fff" opacity=".10"/>
+<circle cx="589.5648148148148" cy="105.06841563786008" r="156.95130315500685" fill="#fff" opacity=".12"/>
+<circle cx="507.5352366255144" cy="480.858024691358" r="71.04273834019205" fill="#fff" opacity=".08"/>
+<g transform="translate(400 300) scale(2.6)"><path d="M-46 4L0-38L46 4M-32-6V40H32V-6" fill="none" stroke="#fff" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><rect x="-10" y="14" width="20" height="26" rx="4" fill="none" stroke="#fff" stroke-width="6"/></g></svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="refugees illustration">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0EA5E9"/><stop offset="1" stop-color="#6366F1"/></linearGradient>
+<radialGradient id="h" cx=".3" cy=".2" r=".9"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+<rect width="800" height="600" fill="url(#g)"/><rect width="800" height="600" fill="url(#h)"/>
+<circle cx="179.32853223593963" cy="469.85493827160496" r="221.41010802469134" fill="#fff" opacity=".10"/>
+<circle cx="560.858024691358" cy="85.93055555555556" r="144.19272976680384" fill="#fff" opacity=".12"/>
+<circle cx="466.06987311385456" cy="556.5046296296297" r="63.068629972565155" fill="#fff" opacity=".08"/>
+<g transform="translate(400 300) scale(2.6)"><path d="M-48 40L0-40L48 40ZM-14 40L0 8L14 40" fill="none" stroke="#fff" stroke-width="6" stroke-linejoin="round"/></g></svg>

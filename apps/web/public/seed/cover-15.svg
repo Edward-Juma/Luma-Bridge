@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="small business illustration">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#10B981"/><stop offset="1" stop-color="#2563EB"/></linearGradient>
+<radialGradient id="h" cx=".3" cy=".2" r=".9"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+<rect width="800" height="600" fill="url(#g)"/><rect width="800" height="600" fill="url(#h)"/>
+<circle cx="249.50068587105625" cy="402.4840534979424" r="170.88194444444446" fill="#fff" opacity=".10"/>
+<circle cx="639.8016975308642" cy="138.559670781893" r="179.27880658436214" fill="#fff" opacity=".12"/>
+<circle cx="320.09962277091904" cy="505.97646604938274" r="84.9974279835391" fill="#fff" opacity=".08"/>
+<g transform="translate(400 300) scale(2.6)"><path d="M-46-14L-36-38H36L46-14ZM-40-14V40H40V-14M-14 40V10H14V40" fill="none" stroke="#fff" stroke-width="6" stroke-linejoin="round"/></g></svg>

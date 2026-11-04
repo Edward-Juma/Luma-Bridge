@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="food illustration">
+<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F59E0B"/><stop offset="1" stop-color="#EF4444"/></linearGradient>
+<radialGradient id="h" cx=".3" cy=".2" r=".9"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+<rect width="800" height="600" fill="url(#g)"/><rect width="800" height="600" fill="url(#h)"/>
+<circle cx="223.9835390946502" cy="503.34619341563786" r="156.52854938271605" fill="#fff" opacity=".10"/>
+<circle cx="611.0949074074074" cy="119.42181069958848" r="166.52023319615913" fill="#fff" opacity=".12"/>
+<circle cx="538.6342592592592" cy="491.62307098765433" r="77.02331961591221" fill="#fff" opacity=".08"/>
+<g transform="translate(400 300) scale(2.6)"><path d="M-44 -4H44C44 26 24 42 0 42S-44 26-44 -4Z" fill="none" stroke="#fff" stroke-width="6" stroke-linejoin="round"/><path d="M-16-14C-26-26-6-30-16-44M12-14C2-26 22-30 12-44" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/></g></svg>
