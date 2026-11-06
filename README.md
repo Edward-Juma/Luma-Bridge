@@ -76,7 +76,7 @@ The smoke suite covers donations and privacy projection, registration, duplicate
 | Piece | Suggested host | Notes |
 | --- | --- | --- |
 | Web | Vercel | Set `API_URL` to the API's public URL and `NEXT_PUBLIC_SITE_URL`. Next proxies `/api` and `/files`, so cookies stay first-party. |
-| API | Railway or Render | `npm run build -w apps/api`, start with `npm run start -w apps/api`, run `npm run db:deploy` on release. Set `NODE_ENV=production` and `WEB_ORIGIN` to the web origin. |
+| API | Railway or Render | Build from the repository root with `npm ci --include=dev && npm run build -w apps/api` so TypeScript and declaration packages are installed even when `NODE_ENV=production`. Start with `npm run start -w apps/api`, run `npm run db:deploy -w apps/api` on release. Set `NODE_ENV=production` and `WEB_ORIGIN` to the web origin. |
 | Database / cache | Managed Postgres + Redis | |
 | Files | Cloudinary | Fill the three `CLOUDINARY_*` vars. Without them files go to local disk, which is fine for development only. |
 | CDN / WAF | Cloudflare | |
