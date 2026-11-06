@@ -32,6 +32,14 @@ export const authLimiter = rateLimit({
   ...json429('Too many attempts. Try again in a few minutes.'),
 });
 
+export const emailAvailabilityLimiter = rateLimit({
+  windowMs: 15 * 60_000,
+  limit: 20,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  ...json429('Too many email checks. Please try again later.'),
+});
+
 export const donationLimiter = rateLimit({
   windowMs: 10 * 60_000,
   limit: 20,

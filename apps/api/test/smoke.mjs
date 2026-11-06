@@ -98,8 +98,12 @@ async function main() {
     about: 'I am a tailor supporting my family and need help after losing my equipment in a fire.',
   };
   const b = new Client();
+  const availableEmail = await new Client().call('POST', '/api/auth/email-availability', { json: { email: reg.email } });
+  ok(availableEmail.status === 200 && availableEmail.data.available, 'new registration email is available');
   const r1 = await b.call('POST', '/api/auth/register', { json: reg });
   ok(r1.status === 201 && r1.data.accessToken, 'register', JSON.stringify(r1.data));
+  const takenEmail = await new Client().call('POST', '/api/auth/email-availability', { json: { email: reg.email } });
+  ok(takenEmail.status === 200 && !takenEmail.data.available, 'registered email is unavailable');
   b.token = r1.data.accessToken;
   const dup = await new Client().call('POST', '/api/auth/register', { json: { ...reg, email: `other${stamp}@example.com` } });
   ok(dup.status === 409, 'duplicate national ID / phone rejected');

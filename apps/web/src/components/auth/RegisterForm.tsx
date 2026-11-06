@@ -9,7 +9,7 @@ import { useMemo, useState } from 'react';
 import { useForm, type FieldPath } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
-import { ApiError } from '@/lib/api';
+import { ApiError, api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { countryOptions } from '@/lib/countries';
 import { cn } from '@/lib/utils';
@@ -68,6 +68,7 @@ export function RegisterForm() {
   const { register: signUp } = useAuth();
   const router = useRouter();
   const [step, setStep] = useState(0);
+  const [checkingEmail, setCheckingEmail] = useState(false);
   const countries = useMemo(() => countryOptions(), []);
 
   const f = useForm<Values>({
@@ -81,7 +82,32 @@ export function RegisterForm() {
 
   async function next() {
     const ok = await f.trigger(STEPS[step]!.fields);
-    if (ok) setStep((s) => s + 1);
+    if (!ok) return;
+
+    if (step === 0) {
+      setCheckingEmail(true);
+      try {
+        const result = await api<{ available: boolean }>('/api/auth/email-availability', {
+          method: 'POST',
+          json: { email: f.getValues('email') },
+          auth: false,
+        });
+        if (!result.available) {
+          f.setError('email', { type: 'server', message: 'This email is already registered. Sign in or use another email.' });
+          return;
+        }
+      } catch (e) {
+        f.setError('email', {
+          type: 'server',
+          message: e instanceof ApiError ? e.message : 'Could not check this email. Please try again.',
+        });
+        return;
+      } finally {
+        setCheckingEmail(false);
+      }
+    }
+
+    setStep((s) => s + 1);
   }
 
   async function onSubmit(v: Values) {
@@ -215,7 +241,9 @@ export function RegisterForm() {
           <span className="text-[15px] text-muted">Already registered? <Link href="/login" className="font-semibold text-brand underline-offset-4 hover:underline">Sign in</Link></span>
         )}
         {step < STEPS.length - 1 ? (
-          <button type="button" className="btn-primary" onClick={next}>Continue <ArrowRight className="h-4 w-4" aria-hidden /></button>
+          <button type="button" className="btn-primary" onClick={next} disabled={checkingEmail}>
+            {checkingEmail ? <Spinner /> : <>Continue <ArrowRight className="h-4 w-4" aria-hidden /></>}
+          </button>
         ) : (
           <button type="submit" className="btn-primary" disabled={isSubmitting}>{isSubmitting ? <Spinner /> : 'Create my account'}</button>
         )}

@@ -8,7 +8,7 @@ import { prisma } from '../db';
 import { wrap, badRequest, conflict, unauthorized, HttpError } from '../lib/errors';
 import { validate } from '../middleware/validate';
 import { loginSchema, mfaVerifySchema, registerSchema } from '../schemas';
-import { authLimiter, issueCsrf, requireCsrf, CSRF_COOKIE } from '../middleware/security';
+import { authLimiter, emailAvailabilityLimiter, issueCsrf, requireCsrf, CSRF_COOKIE } from '../middleware/security';
 import { requireAuth, requireRole } from '../middleware/auth';
 import { encrypt, decrypt, fingerprint, sha256, randomToken } from '../lib/crypto';
 import {
@@ -34,6 +34,16 @@ const MAX_FAILED = 5;
 const LOCK_MINUTES = 15;
 
 authenticator.options = { window: 1 };
+
+authRouter.post(
+  '/email-availability',
+  emailAvailabilityLimiter,
+  validate(z.object({ email: z.string().trim().toLowerCase().email().max(200) })),
+  wrap(async (req, res) => {
+    const user = await prisma.user.findUnique({ where: { email: req.body.email }, select: { id: true } });
+    res.json({ available: !user });
+  }),
+);
 
 function setRefreshCookie(res: Response, token: string) {
   res.cookie(RT_COOKIE, token, {
