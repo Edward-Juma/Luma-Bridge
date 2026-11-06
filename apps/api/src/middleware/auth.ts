@@ -67,11 +67,18 @@ export function optionalAuth(req: Request, _res: Response, next: NextFunction) {
 /** Requires a valid token AND an active (non-suspended, non-banned) account. */
 export async function requireAuth(req: Request, _res: Response, next: NextFunction) {
   try {
-    const { userId } = getAuth(req);
-    if (!userId) throw unauthorized('Session expired');
-    req.clerkUserId = userId;
-    const user = await localUserForClerkId(userId);
-    if (!user) throw unauthorized();
+    const token = req.header('authorization')?.match(/^Bearer\s+(.+)$/i)?.[1];
+    if (!token) throw unauthorized('Session expired');
+
+    let claims;
+    try {
+      claims = verifyAccess(token);
+    } catch {
+      throw unauthorized('Session expired');
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: claims.sub } });
+    if (!user || user.role !== claims.role) throw unauthorized('Session expired');
     if (user.status === 'BANNED') throw forbidden('This account has been permanently banned.');
     if (user.status === 'SUSPENDED') {
       if (!user.suspendedUntil || user.suspendedUntil > new Date()) {
@@ -82,17 +89,7 @@ export async function requireAuth(req: Request, _res: Response, next: NextFuncti
         data: { status: 'ACTIVE', suspendedUntil: null, statusReason: null },
       });
     }
-    let mfa = false;
-    const grant = req.header('x-luma-mfa');
-    if (grant) {
-      try {
-        const claims = verifyAccess(grant);
-        mfa = claims.sub === user.id && claims.role === user.role && Boolean(claims.mfa);
-      } catch {
-        mfa = false;
-      }
-    }
-    req.user = { id: user.id, role: user.role, mfa };
+    req.user = { id: user.id, role: user.role, mfa: Boolean(claims.mfa) };
     next();
   } catch (e) {
     next(e);
